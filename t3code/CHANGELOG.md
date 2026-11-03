@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1
+
+- Fix "Provider turn failed" in Claude sessions: set `IS_SANDBOX=1`, because Claude Code refuses T3's permission flags when running as root
+- Add a `machine_name` option for the name T3 Code shows for this machine
+- Correct the container name in the login instructions (`app_` prefix)
+
 ## 0.4.0
 
 - Switch to a Debian base image: the `t3` npm package now downloads a glibc server executable that cannot run on Alpine

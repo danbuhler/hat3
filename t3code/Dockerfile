@@ -26,6 +26,10 @@ ENV PATH="/root/.local/bin:${PATH}"
 RUN curl -fsSL https://claude.ai/install.sh | bash && \
     claude --version
 
+# Add-ons run as root, and Claude Code refuses T3's permission flags as root
+# unless it is told it is running in a sandbox.
+ENV IS_SANDBOX=1
+
 # Copy rootfs overlay (helper scripts, CLAUDE.md template)
 COPY rootfs /
 

@@ -25,6 +25,12 @@ export T3CODE_HOME=/data/t3code
 # Override the Docker hostname (HA sets it to the full slug with repo hash)
 hostname t3code 2>/dev/null || true
 
+# T3 reads its display name from here once, when the server starts
+if bashio::config.has_value 'machine_name'; then
+    machine_name="$(bashio::config 'machine_name')"
+    printf 'PRETTY_HOSTNAME="%s"\n' "${machine_name//\"/}" > /etc/machine-info
+fi
+
 # Check Claude auth status and guide user if not logged in
 if claude auth status 2>/dev/null | grep -q '"loggedIn"[[:space:]]*:[[:space:]]*true'; then
     bashio::log.info "Claude is authenticated"
@@ -33,9 +39,9 @@ else
     bashio::log.warning "  Claude is NOT authenticated."
     bashio::log.warning "  To log in, run this from a shell on the HA host:"
     bashio::log.warning ""
-    bashio::log.warning "    docker exec -it addon_1be93311_t3code claude auth login"
+    bashio::log.warning "    docker exec -it app_1be93311_t3code claude auth login"
     bashio::log.warning ""
-    bashio::log.warning "  (Use addon_local_t3code for a local add-on install.)"
+    bashio::log.warning "  (Use app_local_t3code for a local add-on install.)"
     bashio::log.warning ""
     bashio::log.warning "  Follow the OAuth prompts, then restart"
     bashio::log.warning "  this add-on."

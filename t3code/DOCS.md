@@ -11,6 +11,12 @@ This add-on runs T3 Code in headless serve mode with full Home Assistant managem
 3. **Authenticate Claude**: See [Claude Authentication](#claude-authentication). Credentials persist across restarts.
 4. You're ready — create a Claude session in the T3 web UI.
 
+## Machine Name
+
+Set **Machine name** in the **Configuration** tab to change the name T3 Code shows for this machine, then restart the add-on.
+
+Clients that are already paired keep showing the old name. To update one, generate a new token and pair it again using the same URL. If the old name stays, use **Remove from this device** under **Settings > Environments** and then pair again, which also clears that client's saved pairing and cached threads.
+
 ## Port
 
 The web interface runs on port **3773** by default. Access it at `http://<your-ha-ip>:3773` after pairing.
@@ -36,17 +42,17 @@ Claude uses OAuth — no API keys needed. Authenticate once and credentials pers
 **To authenticate (first time or after token expiry):** run this from a shell on the HA host. The `ha` CLI has no way to run a command inside an add-on, so this needs `docker`:
 
 ```bash
-docker exec -it addon_1be93311_t3code claude auth login
+docker exec -it app_1be93311_t3code claude auth login
 ```
 
 Follow the prompts: visit the URL, authorize, paste the code back. Then restart the add-on.
 
-The container name comes from the repository URL, so `1be93311` is specific to `https://github.com/danbuhler/hat3`. A local add-on install uses `addon_local_t3code` instead.
+The container name comes from the repository URL, so `1be93311` is specific to `https://github.com/danbuhler/hat3`. A local add-on install uses `app_local_t3code` instead. Older Home Assistant versions use an `addon_` prefix, so run `docker ps | grep t3code` if the name is not found.
 
 **To check auth status:**
 
 ```bash
-docker exec addon_1be93311_t3code claude auth status
+docker exec app_1be93311_t3code claude auth status
 ```
 
 ## Pairing Tokens
