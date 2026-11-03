@@ -17,6 +17,10 @@ Set **Machine name** in the **Configuration** tab to change the name T3 Code sho
 
 Clients that are already paired keep showing the old name. To update one, generate a new token and pair it again using the same URL. If the old name stays, use **Remove from this device** under **Settings > Environments** and then pair again, which also clears that client's saved pairing and cached threads.
 
+## Extra Packages
+
+List Debian package names under **Extra packages** in the **Configuration** tab, then restart the add-on. They are installed on each start, because the container is recreated on restarts and updates, so long lists slow startup. A package that fails to install is logged as a warning and the add-on still starts.
+
 ## Port
 
 The web interface runs on port **3773** by default. Access it at `http://<your-ha-ip>:3773` after pairing.
@@ -55,6 +59,16 @@ The container name comes from the repository URL, so `1be93311` is specific to `
 docker exec app_1be93311_t3code claude auth status
 ```
 
+## GitHub CLI
+
+`gh` is installed. To log in, run this from a shell on the HA host:
+
+```bash
+docker exec -it app_1be93311_t3code gh auth login
+```
+
+The login is stored in `/data/gh`, so it survives restarts and updates, and is included in add-on backups. Once logged in, `git` uses it for GitHub automatically. Settings made with `git config --global`, such as your name and email, are kept in `/data/.gitconfig`. Claude sessions in this add-on can use the same GitHub access, so consider a token limited to the repositories it needs.
+
 ## Pairing Tokens
 
 The T3 pairing token is printed to logs on startup. If you need a new one:
@@ -65,6 +79,8 @@ The T3 pairing token is printed to logs on startup. If you need a new one:
 
 - **T3 data** (sessions, auth, projects) is stored in `/data/t3code` and survives add-on updates.
 - **Claude credentials** are stored in `/data/.claude`.
+- **GitHub CLI login** is stored in `/data/gh`.
+- **Backups** leave out the downloaded T3 Code server (`/data/t3code/runtime`), which is downloaded again on the next start after a restore.
 - **HA config** is at `/config` (the real HA config directory, read/write).
 - **Shared files** live in `/share`, accessible from other add-ons and via Samba/SSH.
 

@@ -31,6 +31,28 @@ if bashio::config.has_value 'machine_name'; then
     printf 'PRETTY_HOSTNAME="%s"\n' "${machine_name//\"/}" > /etc/machine-info
 fi
 
+# Containers are recreated on restart and update, so install these on each start.
+# Install one at a time so a bad name or a network failure can't block the rest.
+if bashio::config.has_value 'extra_packages'; then
+    apt_updated=false
+    for package in $(bashio::config 'extra_packages'); do
+        if dpkg -s "$package" >/dev/null 2>&1; then
+            continue
+        fi
+        if [ "$apt_updated" = false ]; then
+            bashio::log.info "Updating package lists for extra packages..."
+            timeout 300 apt-get update -qq >/dev/null 2>&1 || \
+                bashio::log.warning "Could not update package lists"
+            apt_updated=true
+        fi
+        bashio::log.info "Installing extra package: ${package}"
+        if ! DEBIAN_FRONTEND=noninteractive timeout 600 \
+            apt-get install -y -qq --no-install-recommends "$package" >/dev/null 2>&1; then
+            bashio::log.warning "Could not install extra package: ${package}"
+        fi
+    done
+fi
+
 # Check Claude auth status and guide user if not logged in
 if claude auth status 2>/dev/null | grep -q '"loggedIn"[[:space:]]*:[[:space:]]*true'; then
     bashio::log.info "Claude is authenticated"

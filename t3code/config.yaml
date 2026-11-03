@@ -1,5 +1,5 @@
 name: T3 Code
-version: 0.4.1
+version: 0.5.0
 slug: t3code
 description: Web GUI for AI coding agents — Claude, Codex, and more
 url: https://github.com/danbuhler/hat3
@@ -31,7 +31,14 @@ hassio_api: true
 hassio_role: admin
 auth_api: true
 
+# Re-downloaded on demand, so it does not need to be in every backup
+backup_exclude:
+  - t3code/runtime
+
 options:
   machine_name: homeassistant
+  extra_packages: []
 schema:
   machine_name: str
+  extra_packages:
+    - match(^[a-z0-9][a-z0-9+.-]+$)

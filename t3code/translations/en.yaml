@@ -2,5 +2,8 @@ configuration:
   machine_name:
     name: Machine name
     description: The name T3 Code shows for this machine. Clients that are already paired keep the old name until you pair them again.
+  extra_packages:
+    name: Extra packages
+    description: Debian packages to install each time the add-on starts, such as sqlite3 or ripgrep. A package that fails to install is logged and skipped.
 network:
   3773/tcp: T3 Code web interface

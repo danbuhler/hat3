@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0
+
+- Install the GitHub CLI (`gh`), with its login kept in `/data/gh` and `git` set up to use it for GitHub
+- Keep `git config --global` settings, such as your identity, in `/data/.gitconfig`
+- Add an `extra_packages` option that installs Debian packages on each start
+- Exclude the downloaded T3 Code server from add-on backups
+
 ## 0.4.1
 
 - Fix "Provider turn failed" in Claude sessions: set `IS_SANDBOX=1`, because Claude Code refuses T3's permission flags when running as root

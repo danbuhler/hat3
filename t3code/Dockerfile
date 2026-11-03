@@ -17,6 +17,23 @@ RUN apt-get update && \
         openssh-client && \
     rm -rf /var/lib/apt/lists/*
 
+# GitHub CLI from its official apt repository. Keep its login on persistent
+# storage and let git use it for GitHub, since /root does not survive updates.
+RUN mkdir -p -m 755 /etc/apt/keyrings && \
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        -o /etc/apt/keyrings/githubcli-archive-keyring.gpg && \
+    chmod a+r /etc/apt/keyrings/githubcli-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        > /etc/apt/sources.list.d/github-cli.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends gh && \
+    rm -rf /var/lib/apt/lists/* && \
+    git config --system credential.https://github.com.helper '!gh auth git-credential'
+ENV GH_CONFIG_DIR=/data/gh
+
+# Keep git identity and other global settings on persistent storage too
+ENV GIT_CONFIG_GLOBAL=/data/.gitconfig
+
 # t3 is a small launcher. On first run it downloads the server for this
 # platform into $T3CODE_HOME, which run.sh keeps on persistent storage.
 RUN npm install -g t3
