@@ -11,6 +11,12 @@ This add-on runs T3 Code in headless serve mode with full Home Assistant managem
 3. **Authenticate Claude**: See [Claude Authentication](#claude-authentication). Credentials persist across restarts.
 4. You're ready — create a Claude session in the T3 web UI.
 
+## Home Assistant Project
+
+On first start, the add-on adds `/config` as a project named **Home Assistant** in T3 Code. If you remove the project in T3 Code, it stays removed.
+
+The project icon comes from `/config/favicon.svg`, a blue Home Assistant icon from [Material Design Icons](https://pictogrammers.com/library/mdi/) (Apache 2.0). The add-on writes this file only when it is missing, so you can replace it with your own, and it comes back if you delete it.
+
 ## Machine Name
 
 Set **Machine name** in the **Configuration** tab to change the name T3 Code shows for this machine, then restart the add-on.

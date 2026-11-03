@@ -78,6 +78,30 @@ if [ ! -f /config/CLAUDE.md ]; then
     cp /etc/t3code/CLAUDE.md /config/CLAUDE.md
 fi
 
+# Correct the config check command in CLAUDE.md files installed by older versions
+if grep -q 'ha /core/api/config/core/check\([^_]\|$\)' /config/CLAUDE.md; then
+    bashio::log.info "Correcting the config check command in /config/CLAUDE.md"
+    sed -i 's#ha /core/api/config/core/check\([^_]\|$\)#ha /core/api/config/core/check_config -X POST\1#' /config/CLAUDE.md
+fi
+
+# Give the config project a Home Assistant icon, without replacing one you added
+if [ ! -f /config/favicon.svg ]; then
+    cp /etc/t3code/favicon.svg /config/favicon.svg
+fi
+
+# Add /config as a T3 project once, so removing it in T3 sticks. This also
+# downloads the T3 server on the first start of each version.
+if [ ! -f /data/t3code/.config-project-added ]; then
+    bashio::log.info "Adding /config as a T3 Code project..."
+    if project_output="$(t3 project add /config --title "Home Assistant" 2>&1)" || \
+        grep -q 'ProjectAlreadyExistsError' <<< "$project_output"; then
+        touch /data/t3code/.config-project-added
+    else
+        bashio::log.warning "Could not add /config as a T3 Code project"
+        bashio::log.warning "$(tail -n 3 <<< "$project_output")"
+    fi
+fi
+
 bashio::log.info "Starting T3 Code server on port 3773..."
 bashio::log.info "The first start of each version downloads the server, which can take a few minutes"
 bashio::log.info "Working directory: /config"

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1
+
+- Fix the config check command in `CLAUDE.md`: the endpoint was wrong, so the check Claude is told to run before restarts failed. Existing `/config/CLAUDE.md` files are corrected on start
+- Fix the `ha` helper: failed requests now exit with an error and show Home Assistant's response, and plain-text responses are no longer lost
+- Add `/config` as a "Home Assistant" project in T3 Code on first start, with a Home Assistant icon (`/config/favicon.svg`)
+
 ## 0.5.0
 
 - Install the GitHub CLI (`gh`), with its login kept in `/data/gh` and `git` set up to use it for GitHub

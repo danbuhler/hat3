@@ -15,7 +15,7 @@
 #   ha /core/api/states/light.living_room             Get one entity
 #   ha /core/api/services/light/turn_on \
 #      '{"entity_id":"light.living_room"}'            Call a service
-#   ha /core/api/config/core/check                    Validate config
+#   ha /core/api/config/core/check_config -X POST     Validate config
 #   ha /core/api/template \
 #      '{"template":"{{ states.sensor.temp.state }}"}'  Render a template
 #
@@ -35,18 +35,34 @@ fi
 ENDPOINT="$1"
 shift
 
+args=(-sS
+    -H "Authorization: Bearer ${SUPERVISOR_TOKEN}"
+    -H "Content-Type: application/json")
+
 # If the next arg looks like JSON (starts with { or [), treat it as POST body
 if [ $# -ge 1 ] && [[ "$1" =~ ^[\{\[] ]]; then
-    curl -sSf \
-        -H "Authorization: Bearer ${SUPERVISOR_TOKEN}" \
-        -H "Content-Type: application/json" \
-        -d "$1" \
-        "http://supervisor${ENDPOINT}" \
-        "${@:2}" | jq . 2>/dev/null || cat
-else
-    curl -sSf \
-        -H "Authorization: Bearer ${SUPERVISOR_TOKEN}" \
-        -H "Content-Type: application/json" \
-        "http://supervisor${ENDPOINT}" \
-        "$@" | jq . 2>/dev/null || cat
+    args+=(-d "$1")
+    shift
 fi
+
+response="$(mktemp)"
+trap 'rm -f "$response"' EXIT
+
+status="$(curl "${args[@]}" -o "$response" -w '%{http_code}' "$@" "http://supervisor${ENDPOINT}")"
+
+# Format JSON documents, and print anything else (like template results) as is
+print_response() {
+    if jq -e 'type == "object" or type == "array"' "$response" >/dev/null 2>&1; then
+        jq . "$response"
+    else
+        cat "$response"
+    fi
+}
+
+if [ "$status" -ge 400 ]; then
+    print_response >&2
+    echo "ha: HTTP ${status} from ${ENDPOINT}" >&2
+    exit 1
+fi
+
+print_response

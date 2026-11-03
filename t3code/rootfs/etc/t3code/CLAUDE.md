@@ -23,7 +23,7 @@ ha /core/api/services/automation/trigger '{"entity_id":"automation.morning"}'
 ha /core/api/template '{"template":"{{ states.sensor.temp.state }} {{ state_attr(\"sensor.temp\",\"unit_of_measurement\") }}"}'
 
 # Config validation
-ha /core/api/config/core/check
+ha /core/api/config/core/check_config -X POST
 
 # Supervisor
 ha /supervisor/info
@@ -65,7 +65,7 @@ Config files are YAML. The main file is `/config/configuration.yaml`. After edit
 
 ```bash
 # Validate before reloading
-ha /core/api/config/core/check
+ha /core/api/config/core/check_config -X POST
 
 # Reload specific domains (no restart needed)
 ha /core/api/services/automation/reload -X POST
@@ -136,7 +136,7 @@ morning_routine:
 
 ## Important Notes
 
-- Always run `ha /core/api/config/core/check` before restarting HA after config changes.
+- Always run `ha /core/api/config/core/check_config -X POST` before restarting HA after config changes.
 - Prefer domain-specific reloads over full restarts.
 - Use `!include` to split large configs into separate files.
 - Entity IDs use the format `domain.object_id` (e.g., `light.kitchen`, `sensor.temperature`).
