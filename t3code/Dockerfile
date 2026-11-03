@@ -1,40 +1,29 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-# Install Node.js (>=22 from Alpine 3.21), build tools for node-pty, and utils
-RUN apk add --no-cache \
-    nodejs \
-    npm \
-    build-base \
-    python3 \
-    git \
-    curl \
-    bash \
-    jq \
-    openssh-client
+# The t3 server ships as a prebuilt glibc executable, so this add-on needs a
+# Debian base (see build.yaml); it cannot start on Alpine/musl.
+# Debian trixie's Node.js satisfies the t3 launcher's >=20.11 requirement.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        nodejs \
+        npm \
+        python3 \
+        git \
+        curl \
+        ca-certificates \
+        bash \
+        jq \
+        openssh-client && \
+    rm -rf /var/lib/apt/lists/*
 
-# node-pty requires node-gyp to build from source (no linux musl prebuild)
-RUN npm install -g node-gyp
-
-# Install t3 globally (includes claude-agent-sdk with platform-specific binary)
+# t3 is a small launcher. On first run it downloads the server for this
+# platform into $T3CODE_HOME, which run.sh keeps on persistent storage.
 RUN npm install -g t3
 
-# The SDK's optional dep @anthropic-ai/claude-agent-sdk-linux-x64-musl
-# contains a native Claude binary version-matched to the SDK.
-# Symlink it to PATH so both T3 (which passes "claude" to the SDK) and
-# our auth-check commands find the correct binary.
+# The t3 package no longer bundles a Claude binary, so use the native installer.
 ENV PATH="/root/.local/bin:${PATH}"
-RUN SDK_CLAUDE="$(find /usr/local/lib/node_modules/t3/node_modules/@anthropic-ai \
-        -name 'claude' -type f -path '*musl*' 2>/dev/null | head -1)" && \
-    if [ -n "$SDK_CLAUDE" ]; then \
-        chmod +x "$SDK_CLAUDE" && \
-        mkdir -p /usr/local/bin && \
-        ln -sf "$SDK_CLAUDE" /usr/local/bin/claude && \
-        echo "Using SDK-bundled Claude binary: $SDK_CLAUDE"; \
-    else \
-        echo "SDK musl binary not found — installing via curl" && \
-        curl -fsSL https://claude.ai/install.sh | bash; \
-    fi && \
+RUN curl -fsSL https://claude.ai/install.sh | bash && \
     claude --version
 
 # Copy rootfs overlay (helper scripts, CLAUDE.md template)

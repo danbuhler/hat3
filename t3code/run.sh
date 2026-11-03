@@ -31,13 +31,11 @@ if claude auth status 2>/dev/null | grep -q '"loggedIn"[[:space:]]*:[[:space:]]*
 else
     bashio::log.warning "=========================================="
     bashio::log.warning "  Claude is NOT authenticated."
-    bashio::log.warning "  To log in, open a shell to this add-on:"
+    bashio::log.warning "  To log in, run this from a shell on the HA host:"
     bashio::log.warning ""
-    bashio::log.warning "    ha addons exec local_t3code -- claude /quit"
+    bashio::log.warning "    docker exec -it addon_1be93311_t3code claude auth login"
     bashio::log.warning ""
-    bashio::log.warning "  Or via Docker:"
-    bashio::log.warning ""
-    bashio::log.warning "    docker exec -it addon_local_t3code claude /quit"
+    bashio::log.warning "  (Use addon_local_t3code for a local add-on install.)"
     bashio::log.warning ""
     bashio::log.warning "  Follow the OAuth prompts, then restart"
     bashio::log.warning "  this add-on."
@@ -53,6 +51,7 @@ if [ ! -f /config/CLAUDE.md ]; then
 fi
 
 bashio::log.info "Starting T3 Code server on port 3773..."
+bashio::log.info "The first start of each version downloads the server, which can take a few minutes"
 bashio::log.info "Working directory: /config"
 bashio::log.info "Check the logs below for the pairing token/URL"
 

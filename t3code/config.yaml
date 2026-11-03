@@ -1,8 +1,8 @@
 name: T3 Code
-version: 0.3.4
+version: 0.4.0
 slug: t3code
 description: Web GUI for AI coding agents — Claude, Codex, and more
-url: https://github.com/cinderblock/hat3
+url: https://github.com/danbuhler/hat3
 arch:
   - aarch64
   - amd64

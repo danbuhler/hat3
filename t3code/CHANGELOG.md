@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- Switch to a Debian base image: the `t3` npm package now downloads a glibc server executable that cannot run on Alpine
+- Install Claude Code with the native installer: the `t3` package no longer bundles a Claude binary, which made the Docker build fail
+- Remove `node-gyp` and build tools: the server ships a prebuilt `node-pty`
+- Correct the install and Claude login instructions
+
 ## 0.3.4
 
 - Fix Docker layer cache not invalidating on run.sh changes (COPY config.yaml as cache-buster)
