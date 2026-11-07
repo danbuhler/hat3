@@ -6,4 +6,4 @@ configuration:
     name: Extra packages
     description: Debian packages to install each time the add-on starts, such as sqlite3 or ripgrep. A package that fails to install is logged and skipped.
 network:
-  3773/tcp: T3 Code web interface
+  3773/tcp: T3 Code web interface. Clear this to close the port on your LAN, for example when you use Tailscale

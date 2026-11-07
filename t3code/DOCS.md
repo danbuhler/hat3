@@ -7,7 +7,7 @@ This add-on runs T3 Code in headless serve mode with full Home Assistant managem
 ## Setup
 
 1. **Start the add-on** and check the **Log** tab for the pairing URL.
-2. **Pair your browser**: Copy the `Pairing URL:` from the logs and open it in your browser.
+2. **Pair your browser**: Copy the token from the end of the `Pairing URL:` in the logs and open `http://<your-ha-ip>:3773/pair#token=<token>`, or your Tailscale address (see [Port](#port)). The logged URL itself uses an internal Docker address.
 3. **Authenticate Claude**: See [Claude Authentication](#claude-authentication). Credentials persist across restarts.
 4. You're ready — create a Claude session in the T3 web UI.
 
@@ -29,7 +29,10 @@ List Debian package names under **Extra packages** in the **Configuration** tab,
 
 ## Port
 
-The web interface runs on port **3773** by default. Access it at `http://<your-ha-ip>:3773` after pairing.
+The web interface runs on port **3773** and is published on the Home Assistant host by default, so you can open `http://<your-ha-ip>:3773`. This is plain HTTP and open to your whole LAN.
+
+- **Tailscale (recommended)**: install the Tailscale add-on and use Tailscale Serve to give T3 Code an HTTPS address that only your tailnet can reach. You can then clear the 3773/tcp field in the **Network** section of the **Configuration** tab to close the LAN port. Step-by-step instructions are in the [README](https://github.com/danbuhler/hat3#remote-access-with-tailscale).
+- **LAN port**: change the host port in the **Network** section if 3773 is taken.
 
 ## What Claude Can Do
 
@@ -107,5 +110,6 @@ T3 Code supports multiple AI coding agent backends:
 
 - **No pairing URL in logs**: The first start of each version downloads the T3 Code server, which can take a few minutes. After that, t3 initializes in 10-20 seconds. If still missing, check for errors above the expected output.
 - **Claude provider not working**: Check auth status (see above). If expired, re-authenticate and restart the add-on.
-- **Port conflict**: If port 3773 is already in use, change the host port mapping in the add-on Network configuration.
+- **Page won't load, or the pairing URL shows a `172.30.x.x` address**: that is the internal Docker address. Use `http://<your-ha-ip>:3773` or Tailscale (see [Port](#port)), and check the port wasn't cleared under **Network**.
+- **Port conflict**: If the host port you chose is already in use, pick another one in the add-on Network configuration.
 - **Config changes not taking effect**: Use the T3 web UI to ask Claude to validate and reload the config, or restart HA from the Supervisor panel.
