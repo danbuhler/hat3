@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.3
+
+- Fix the add-on stopping on start in 0.5.2 before T3 Code was installed in `/data/npm-global`
+
 ## 0.5.2
 
 - Update T3 Code to the newest release on each start, so a restart is enough to upgrade. Older downloaded server versions are deleted, and the add-on starts the installed version if npm cannot be reached

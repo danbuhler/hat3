@@ -22,12 +22,13 @@ fi
 
 export T3CODE_HOME=/data/t3code
 
-# Update T3 Code to the newest release on each start. The t3 launcher's version
+# Update T3 Code to the newest release on each start. bashio enables errexit,
+# so every lookup here that may fail ends in `|| true`. The t3 launcher's version
 # decides which server it runs, so keep the newest launcher on persistent
 # storage. If npm cannot be reached, start the version already installed.
 T3_PREFIX=/data/npm-global
-installed_t3="$(jq -r '.version // empty' "${T3_PREFIX}/lib/node_modules/t3/package.json" 2>/dev/null)"
-latest_t3="$(timeout 30 npm view t3@latest version 2>/dev/null)"
+installed_t3="$(jq -r '.version // empty' "${T3_PREFIX}/lib/node_modules/t3/package.json" 2>/dev/null || true)"
+latest_t3="$(timeout 30 npm view t3@latest version 2>/dev/null || true)"
 if [ -z "$latest_t3" ]; then
     bashio::log.warning "Could not check for a T3 Code update, starting the installed version"
 elif [ "$latest_t3" != "$installed_t3" ]; then
@@ -42,7 +43,7 @@ if [ -x "${T3_PREFIX}/bin/t3" ]; then
 fi
 
 # Download this version's server now, then delete older downloads to save space
-t3_version="$(jq -r '.version // empty' "$(dirname "$(readlink -f "$(command -v t3)")")/../package.json" 2>/dev/null)"
+t3_version="$(jq -r '.version // empty' "$(dirname "$(readlink -f "$(command -v t3)")")/../package.json" 2>/dev/null || true)"
 bashio::log.info "T3 Code version: ${t3_version:-unknown} (the first start of a new version downloads the server)"
 if [ -n "$t3_version" ] && t3 --version >/dev/null 2>&1; then
     for old in /data/t3code/runtime/versions/*; do
