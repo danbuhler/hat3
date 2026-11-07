@@ -81,11 +81,16 @@ The T3 pairing token is printed to logs on startup. If you need a new one:
 
 - **Restart** the add-on — a fresh token is printed each time.
 
+## Updates
+
+T3 Code updates itself: on each start the add-on installs the newest `t3` release from npm, so restarting the add-on is enough to get a new version. The first start of a new version downloads its server, which takes a minute or two, and older downloaded versions are then deleted. If npm cannot be reached, the add-on starts the version it already has. Claude Code updates when the add-on itself is updated.
+
 ## Data Persistence
 
 - **T3 data** (sessions, auth, projects) is stored in `/data/t3code` and survives add-on updates.
 - **Claude credentials** are stored in `/data/.claude`.
 - **GitHub CLI login** is stored in `/data/gh`.
+- **The T3 Code launcher** is installed in `/data/npm-global`.
 - **Backups** leave out the downloaded T3 Code server (`/data/t3code/runtime`), which is downloaded again on the next start after a restore.
 - **HA config** is at `/config` (the real HA config directory, read/write).
 - **Shared files** live in `/share`, accessible from other add-ons and via Samba/SSH.

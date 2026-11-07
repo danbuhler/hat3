@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2
+
+- Update T3 Code to the newest release on each start, so a restart is enough to upgrade. Older downloaded server versions are deleted, and the add-on starts the installed version if npm cannot be reached
+
 ## 0.5.1
 
 - Fix the config check command in `CLAUDE.md`: the endpoint was wrong, so the check Claude is told to run before restarts failed. Existing `/config/CLAUDE.md` files are corrected on start
